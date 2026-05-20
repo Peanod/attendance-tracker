@@ -141,40 +141,48 @@ export const deleteMahasiswa = async (req, res) => {
 
 export const getMahasiswaDashboard = async (req, res) => {
   try {
-    const [profileResult, riwayatResult, mingguResult] = await Promise.all([
+    const [profileResult, riwayatResult, mingguResult, totalSesiResult, totalKehadiranResult] = await Promise.all([
       query(
-        `
-          SELECT id_mahasiswa, nim, nama_mahasiswa, kelas, email
-          FROM mahasiswa
-          WHERE id_mahasiswa = $1
-        `,
+        `SELECT id_mahasiswa, nim, nama_mahasiswa, kelas, email
+         FROM mahasiswa WHERE id_mahasiswa = $1`,
         [req.user.id],
       ),
       query(
-        `
-          SELECT k.id_kehadiran, k.status_kehadiran, k.waktu_presensi, s.tanggal, s.waktu_mulai,
-                 mk.nama_matkul, mk.kode_matkul
-          FROM kehadiran k
-          JOIN sesi_absensi s ON s.id_sesi = k.id_sesi
-          JOIN mata_kuliah mk ON mk.id_matkul = s.id_matkul
-          WHERE k.id_mahasiswa = $1
-          ORDER BY k.waktu_presensi DESC
-          LIMIT 5
-        `,
+        `SELECT k.id_kehadiran, k.status_kehadiran, k.waktu_presensi, s.tanggal, s.waktu_mulai,
+                mk.nama_matkul, mk.kode_matkul
+         FROM kehadiran k
+         JOIN sesi_absensi s ON s.id_sesi = k.id_sesi
+         JOIN mata_kuliah mk ON mk.id_matkul = s.id_matkul
+         WHERE k.id_mahasiswa = $1
+         ORDER BY k.waktu_presensi DESC
+         LIMIT 5`,
         [req.user.id],
       ),
       query(
-        `
-          SELECT COUNT(*)::INT AS attended
-          FROM kehadiran
-          WHERE id_mahasiswa = $1 AND waktu_presensi >= NOW() - INTERVAL '7 days'
-        `,
+        `SELECT COUNT(*)::INT AS attended
+         FROM kehadiran
+         WHERE id_mahasiswa = $1 AND waktu_presensi >= NOW() - INTERVAL '7 days'`,
+        [req.user.id],
+      ),
+      query(
+        `SELECT COUNT(*)::INT AS total
+         FROM sesi_absensi
+         WHERE tanggal >= NOW() - INTERVAL '7 days'`,
+      ),
+      query(
+        `SELECT
+           COUNT(*)::INT AS total_hadir,
+           (SELECT COUNT(*)::INT FROM sesi_absensi) AS total_sesi
+         FROM kehadiran
+         WHERE id_mahasiswa = $1`,
         [req.user.id],
       ),
     ]);
 
-    const totalWeekClasses = 5;
     const attended = mingguResult.rows[0]?.attended ?? 0;
+    const totalWeekClasses = totalSesiResult.rows[0]?.total ?? 0;
+    const totalHadir = totalKehadiranResult.rows[0]?.total_hadir ?? 0;
+    const totalSesi = totalKehadiranResult.rows[0]?.total_sesi ?? 0;
 
     return res.json({
       success: true,
@@ -183,7 +191,7 @@ export const getMahasiswaDashboard = async (req, res) => {
         profile: profileResult.rows[0] ?? null,
         stats: {
           mingguIni: `${attended}/${totalWeekClasses}`,
-          attendanceRate: totalWeekClasses ? Math.round((attended / totalWeekClasses) * 100) : 0,
+          attendanceRate: totalSesi ? Math.round((totalHadir / totalSesi) * 100) : 0,
         },
         riwayatTerbaru: riwayatResult.rows,
       },
@@ -200,11 +208,8 @@ export const getMahasiswaDashboard = async (req, res) => {
 export const getMahasiswaProfile = async (req, res) => {
   try {
     const result = await query(
-      `
-        SELECT id_mahasiswa, nim, nama_mahasiswa, kelas, email, created_at
-        FROM mahasiswa
-        WHERE id_mahasiswa = $1
-      `,
+      `SELECT id_mahasiswa, nim, nama_mahasiswa, kelas, email, created_at
+       FROM mahasiswa WHERE id_mahasiswa = $1`,
       [req.user.id],
     );
 

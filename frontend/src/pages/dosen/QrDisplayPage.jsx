@@ -1,5 +1,5 @@
 import { Clock3 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import PageContainer from "../../components/layout/PageContainer";
 import QrDisplay from "../../components/qr/QrDisplay";
@@ -18,7 +18,8 @@ export default function QrDisplayPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
-  const [ending, setEnding] = useState(false);
+  const [startTime] = useState(Date.now());
+  const autoEndedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -42,6 +43,7 @@ export default function QrDisplayPage() {
     load();
     const interval = setInterval(load, 15000);
     const tick = setInterval(() => setNow(Date.now()), 1000);
+
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -51,31 +53,21 @@ export default function QrDisplayPage() {
 
   const countdown = useMemo(() => {
     if (!session) return "00:00";
-
-    // Hitung dari created_at (saat QR dibuat) + 15 menit
-    const createdAt = session.created_at ? new Date(session.created_at) : null;
-    if (!createdAt) return "00:00";
-
-    const sessionEnd = new Date(createdAt.getTime() + 15 * 60 * 1000);
-    const diff = Math.max(sessionEnd.getTime() - now, 0);
-
-    if (diff === 0) return "00:00";
-
+    const end = new Date(startTime + 15 * 60 * 1000);
+    const diff = Math.max(end.getTime() - now, 0);
     const minutes = String(Math.floor(diff / 60000)).padStart(2, "0");
     const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
     return `${minutes}:${seconds}`;
-  }, [session, now]);
+  }, [session, now, startTime]);
 
-  const handleEndSession = async () => {
-    setEnding(true);
-    try {
-      await endSesi(id);
-      navigate(`/dosen/sesi/${id}/kehadiran`);
-    } catch (error) {
-      setMessage(error.message);
-      setEnding(false);
+  useEffect(() => {
+    if (countdown === "00:00" && session && !autoEndedRef.current) {
+      autoEndedRef.current = true;
+      endSesi(id)
+        .then(() => navigate(`/dosen/sesi/${id}/kehadiran`))
+        .catch(() => navigate(`/dosen/sesi/${id}/kehadiran`));
     }
-  };
+  }, [countdown, session, id, navigate]);
 
   return (
     <PageContainer
@@ -95,8 +87,7 @@ export default function QrDisplayPage() {
           <Card className="text-center">
             <p className="text-lg font-bold sm:text-xl">{session.nama_matkul}</p>
             <p className="mt-1.5 text-xs text-zinc-500 sm:mt-2 sm:text-sm">
-              {session.kode_matkul || "Tanpa kode"} •{" "}
-              {new Date(session.tanggal).toLocaleDateString("id-ID")}
+              {session.kode_matkul || "Tanpa kode"} • {new Date(session.tanggal).toLocaleDateString("id-ID")}
             </p>
             <div className="mt-5 flex items-center justify-center gap-2 text-3xl font-bold sm:mt-6 sm:text-4xl">
               <Clock3 className="h-7 w-7 text-zinc-500 sm:h-8 sm:w-8" />
@@ -104,6 +95,10 @@ export default function QrDisplayPage() {
             </div>
             <p className="mt-1.5 text-xs text-zinc-500 sm:mt-2 sm:text-sm">Time remaining</p>
             <QrDisplay value={session.qr_code} className="mx-auto mt-8 max-w-sm" />
+            <div className="mt-4 rounded-xl bg-zinc-100 px-4 py-3">
+              <p className="text-xs text-zinc-400 mb-1">Token QR (untuk input manual)</p>
+              <p className="font-mono text-xs text-zinc-600 break-all select-all">{session.qr_code}</p>
+            </div>
             <p className="mt-4 text-xs text-zinc-500 sm:mt-6 sm:text-sm">
               Students scan this QR code to mark attendance.
             </p>
@@ -114,23 +109,27 @@ export default function QrDisplayPage() {
               <p className="text-sm text-zinc-500">Students Scanned</p>
               <div className="mt-2 flex items-end justify-between">
                 <p className="text-4xl font-bold">
-                  {attendance?.summary?.present + attendance?.summary?.late ?? 0}/
-                  {attendance?.summary?.total ?? 0}
+                  {attendance?.attendees?.length ?? 0}/{attendance?.summary?.total ?? 0}
                 </p>
                 <p className="text-lg font-semibold text-zinc-600">
                   {attendance?.summary?.total
-                    ? Math.round(
-                        (((attendance?.summary?.present ?? 0) + (attendance?.summary?.late ?? 0)) /
-                          attendance.summary.total) *
-                          100,
-                      )
+                    ? Math.round(((attendance?.attendees?.length ?? 0) / attendance.summary.total) * 100)
                     : 0}
                   %
                 </p>
               </div>
             </Card>
-            {message ? <Alert tone="error" message={message} /> : null}
-            <Button className="w-full" loading={ending} onClick={handleEndSession}>
+            <Alert
+              tone={message ? "error" : "info"}
+              message={message || "API presensi tidak di-cache agresif agar validasi QR selalu online."}
+            />
+            <Button
+              className="w-full"
+              onClick={async () => {
+                await endSesi(id);
+                navigate(`/dosen/sesi/${id}/kehadiran`);
+              }}
+            >
               End Session
             </Button>
           </div>
