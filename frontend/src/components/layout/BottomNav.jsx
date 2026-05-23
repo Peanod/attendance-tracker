@@ -21,12 +21,18 @@ const navByRole = {
   ],
 };
 
+const gridClass = {
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+  4: "grid-cols-4",
+};
+
 export default function BottomNav({ role }) {
   const items = navByRole[role] || [];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200 bg-white/95 px-2 py-2 backdrop-blur md:hidden">
-      <div className={`mx-auto grid max-w-lg gap-1.5 grid-cols-${items.length}`}>
+      <div className={`mx-auto grid max-w-lg gap-1.5 ${gridClass[items.length] ?? "grid-cols-4"}`}>
         {items.map((item) => {
           const Icon = item.icon;
           return (
