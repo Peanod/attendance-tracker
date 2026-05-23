@@ -18,7 +18,6 @@ export default function QrDisplayPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
-  const [startTime] = useState(Date.now());
   const autoEndedRef = useRef(false);
 
   useEffect(() => {
@@ -51,23 +50,31 @@ export default function QrDisplayPage() {
     };
   }, [id]);
 
-  const countdown = useMemo(() => {
-    if (!session) return "00:00";
-    const end = new Date(startTime + 15 * 60 * 1000);
-    const diff = Math.max(end.getTime() - now, 0);
+  const { countdown, isExpired } = useMemo(() => {
+    if (!session) return { countdown: "00:00", isExpired: false };
+
+    const tanggal = session.tanggal
+      ? session.tanggal.split("T")[0]
+      : new Date().toISOString().split("T")[0];
+    const endTime = new Date(`${tanggal}T${session.waktu_selesai}`);
+    const diff = Math.max(endTime.getTime() - now, 0);
     const minutes = String(Math.floor(diff / 60000)).padStart(2, "0");
     const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  }, [session, now, startTime]);
+
+    return {
+      countdown: `${minutes}:${seconds}`,
+      isExpired: diff === 0,
+    };
+  }, [session, now]);
 
   useEffect(() => {
-    if (countdown === "00:00" && session && !autoEndedRef.current) {
+    if (isExpired && session && session.status === "aktif" && !autoEndedRef.current) {
       autoEndedRef.current = true;
       endSesi(id)
         .then(() => navigate(`/dosen/sesi/${id}/kehadiran`))
         .catch(() => navigate(`/dosen/sesi/${id}/kehadiran`));
     }
-  }, [countdown, session, id, navigate]);
+  }, [isExpired, session, id, navigate]);
 
   return (
     <PageContainer
@@ -90,10 +97,12 @@ export default function QrDisplayPage() {
               {session.kode_matkul || "Tanpa kode"} • {new Date(session.tanggal).toLocaleDateString("id-ID")}
             </p>
             <div className="mt-5 flex items-center justify-center gap-2 text-3xl font-bold sm:mt-6 sm:text-4xl">
-              <Clock3 className="h-7 w-7 text-zinc-500 sm:h-8 sm:w-8" />
-              {countdown}
+              <Clock3 className={`h-7 w-7 sm:h-8 sm:w-8 ${isExpired ? "text-red-400" : "text-zinc-500"}`} />
+              <span className={isExpired ? "text-red-500" : ""}>{countdown}</span>
             </div>
-            <p className="mt-1.5 text-xs text-zinc-500 sm:mt-2 sm:text-sm">Time remaining</p>
+            <p className="mt-1.5 text-xs text-zinc-500 sm:mt-2 sm:text-sm">
+              Time remaining • Sesi berakhir {session.waktu_selesai?.slice(0, 5)}
+            </p>
             <QrDisplay value={session.qr_code} className="mx-auto mt-8 max-w-sm" />
             <div className="mt-4 rounded-xl bg-zinc-100 px-4 py-3">
               <p className="text-xs text-zinc-400 mb-1">Token QR (untuk input manual)</p>
@@ -121,7 +130,7 @@ export default function QrDisplayPage() {
             </Card>
             <Alert
               tone={message ? "error" : "info"}
-              message={message || "API presensi tidak di-cache agresif agar validasi QR selalu online."}
+              message={message || "Timer berjalan berdasarkan waktu selesai sesi, tidak akan reset saat halaman ditutup."}
             />
             <Button
               className="w-full"

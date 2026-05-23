@@ -5,18 +5,20 @@ import { useAuth } from "../../hooks/useAuth";
 
 const navByRole = {
   admin: [
-    { to: "/admin", label: "Dashboard", icon: Home },
+    { to: "/admin", label: "Dashboard", icon: Home, end: true },
     { to: "/admin/mahasiswa", label: "Mahasiswa", icon: Users },
     { to: "/admin/dosen", label: "Dosen", icon: GraduationCap },
     { to: "/admin/matkul", label: "Mata Kuliah", icon: BookOpen },
     { to: "/admin/laporan", label: "Laporan Kehadiran", icon: BarChart3 },
+    { to: "/admin/profil", label: "Profil", icon: UserSquare2 },
   ],
   dosen: [
-    { to: "/dosen", label: "Dashboard", icon: Home },
+    { to: "/dosen", label: "Dashboard", icon: Home, end: true },
     { to: "/dosen/sesi/buat", label: "Buat Sesi", icon: QrCode },
+    { to: "/dosen/profil", label: "Profil", icon: UserSquare2 },
   ],
   mahasiswa: [
-    { to: "/mahasiswa", label: "Dashboard", icon: Home },
+    { to: "/mahasiswa", label: "Dashboard", icon: Home, end: true },
     { to: "/mahasiswa/scan", label: "Scan QR", icon: QrCode },
     { to: "/mahasiswa/riwayat", label: "Riwayat", icon: BarChart3 },
     { to: "/mahasiswa/profil", label: "Profil", icon: UserSquare2 },
@@ -51,6 +53,7 @@ export default function Sidebar({ role }) {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end ?? false}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   isActive ? "bg-black text-white" : "text-zinc-600 hover:bg-zinc-100"

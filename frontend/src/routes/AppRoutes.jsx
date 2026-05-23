@@ -5,11 +5,13 @@ import DataDosenPage from "../pages/admin/DataDosenPage";
 import DataMahasiswaPage from "../pages/admin/DataMahasiswaPage";
 import DataMatkulPage from "../pages/admin/DataMatkulPage";
 import LaporanPage from "../pages/admin/LaporanPage";
+import ProfilAdmin from "../pages/admin/ProfilAdmin";
 import LoginPage from "../pages/auth/LoginPage";
 import SignupPage from "../pages/auth/SignupPage";
 import BuatSesiPage from "../pages/dosen/BuatSesiPage";
 import DosenDashboard from "../pages/dosen/DosenDashboard";
 import MonitoringKehadiranPage from "../pages/dosen/MonitoringKehadiranPage";
+import ProfilDosen from "../pages/dosen/ProfilDosen";
 import QrDisplayPage from "../pages/dosen/QrDisplayPage";
 import RekapMatkulPage from "../pages/dosen/RekapMatkulPage";
 import MahasiswaDashboard from "../pages/mahasiswa/MahasiswaDashboard";
@@ -51,6 +53,7 @@ export default function AppRoutes() {
           <Route path="/admin/dosen" element={<DataDosenPage />} />
           <Route path="/admin/matkul" element={<DataMatkulPage />} />
           <Route path="/admin/laporan" element={<LaporanPage />} />
+          <Route path="/admin/profil" element={<ProfilAdmin />} />
         </Route>
 
         <Route element={<RoleRoute allowedRoles={["dosen"]} />}>
@@ -59,6 +62,7 @@ export default function AppRoutes() {
           <Route path="/dosen/sesi/:id/qr" element={<QrDisplayPage />} />
           <Route path="/dosen/sesi/:id/kehadiran" element={<MonitoringKehadiranPage />} />
           <Route path="/dosen/matkul/:idMatkul/rekap" element={<RekapMatkulPage />} />
+          <Route path="/dosen/profil" element={<ProfilDosen />} />
         </Route>
 
         <Route element={<RoleRoute allowedRoles={["mahasiswa"]} />}>
