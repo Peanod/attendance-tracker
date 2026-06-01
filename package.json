@@ -1,0 +1,12 @@
+{
+  "name": "student-attendance-tracker",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "sh -c 'npm --prefix backend run dev & npm --prefix frontend run dev & wait'",
+    "dev:be": "npm --prefix backend run dev",
+    "dev:fe": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend run start"
+  }
+}
