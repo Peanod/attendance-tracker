@@ -83,7 +83,12 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" loading={loading}>
               Sign In
             </Button>
-
+            <p className="text-center text-sm text-zinc-500">
+              Don&apos;t have an account?{" "}
+              <Link to="/signup" className="font-semibold text-black">
+                Sign Up
+              </Link>
+            </p>
           </form>
         </div>
         <div className="mx-auto mt-5 flex w-full max-w-md items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 sm:mt-8 sm:gap-3 sm:rounded-3xl sm:p-4 sm:text-sm">

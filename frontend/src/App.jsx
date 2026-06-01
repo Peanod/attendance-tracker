@@ -2,22 +2,8 @@ import { WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import AppRoutes from "./routes/AppRoutes";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export default function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  // Keep-alive ping agar backend Vercel tidak cold start
-  useEffect(() => {
-    const ping = () => {
-      if (navigator.onLine && API_URL) {
-        fetch(`${API_URL}/health`).catch(() => null);
-      }
-    };
-    ping(); // langsung ping saat app pertama dibuka
-    const interval = setInterval(ping, 4 * 60 * 1000); // ping setiap 4 menit
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

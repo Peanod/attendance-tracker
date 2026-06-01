@@ -178,14 +178,14 @@ export default function QrDisplayPage() {
 
               <div className="mt-2 flex items-end justify-between">
                 <p className="text-4xl font-bold">
-                  {(attendance?.summary?.present ?? 0) + (attendance?.summary?.late ?? 0)}/
+                  {attendance?.attendees?.length ?? 0}/
                   {attendance?.summary?.total ?? 0}
                 </p>
 
                 <p className="text-lg font-semibold text-zinc-600">
                   {attendance?.summary?.total
                     ? Math.round(
-                        (((attendance?.summary?.present ?? 0) + (attendance?.summary?.late ?? 0)) /
+                        ((attendance?.attendees?.length ?? 0) /
                           attendance.summary.total) *
                           100
                       )

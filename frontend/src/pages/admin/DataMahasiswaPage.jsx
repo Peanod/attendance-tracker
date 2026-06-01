@@ -56,7 +56,7 @@ export default function DataMahasiswaPage() {
             <h2 className="text-lg font-semibold">{editingId ? "Edit Mahasiswa" : "Tambah Mahasiswa"}</h2>
           </div>
           <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-            <Input label="NIM" inputMode="numeric" pattern="[0-9]*" value={form.nim} onChange={(e) => setForm({ ...form, nim: e.target.value.replace(/\D/g, "") })} required />
+            <Input label="NIM" value={form.nim} onChange={(e) => setForm({ ...form, nim: e.target.value })} required />
             <Input
               label="Nama Mahasiswa"
               value={form.nama_mahasiswa}

@@ -226,38 +226,3 @@ export const getMahasiswaProfile = async (req, res) => {
     });
   }
 };
-
-export const updateMahasiswaProfile = async (req, res) => {
-  try {
-    const { nama_mahasiswa, kelas, email, password } = req.body;
-    const current = await query("SELECT * FROM mahasiswa WHERE id_mahasiswa = $1", [req.user.id]);
-
-    if (!current.rows[0]) {
-      return res.status(404).json({ success: false, message: "Mahasiswa tidak ditemukan", data: null });
-    }
-
-    const nextPassword = password ? await hashPassword(password) : current.rows[0].password;
-    const result = await query(
-      `UPDATE mahasiswa
-       SET nama_mahasiswa = $1, kelas = $2, email = $3, password = $4, updated_at = NOW()
-       WHERE id_mahasiswa = $5
-       RETURNING id_mahasiswa, nim, nama_mahasiswa, kelas, email`,
-      [
-        nama_mahasiswa ?? current.rows[0].nama_mahasiswa,
-        kelas ?? current.rows[0].kelas,
-        email ?? current.rows[0].email,
-        nextPassword,
-        req.user.id,
-      ],
-    );
-
-    return res.json({ success: true, message: "Profil berhasil diperbarui", data: result.rows[0] });
-  } catch (error) {
-    const status = error.code === "23505" ? 409 : 500;
-    return res.status(status).json({
-      success: false,
-      message: status === 409 ? "Email sudah digunakan" : "Gagal memperbarui profil",
-      data: error.message,
-    });
-  }
-};
