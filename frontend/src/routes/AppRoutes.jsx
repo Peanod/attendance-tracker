@@ -8,7 +8,7 @@ import LaporanPage from "../pages/admin/LaporanPage";
 import ProfilAdmin from "../pages/admin/ProfilAdmin";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import LoginPage from "../pages/auth/LoginPage";
-import SignupPage from "../pages/auth/SignupPage";
+
 import BuatSesiPage from "../pages/dosen/BuatSesiPage";
 import DosenDashboard from "../pages/dosen/DosenDashboard";
 import MonitoringKehadiranPage from "../pages/dosen/MonitoringKehadiranPage";
@@ -44,7 +44,6 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/" element={<HomeRedirect />} />
 

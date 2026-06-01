@@ -7,7 +7,7 @@ import Loading from "../../components/ui/Loading";
 import { useFetch } from "../../hooks/useFetch";
 import { getRiwayatKehadiran } from "../../services/kehadiran.service";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 export default function RiwayatKehadiranPage() {
   const { data, loading, error } = useFetch(getRiwayatKehadiran, [], {
