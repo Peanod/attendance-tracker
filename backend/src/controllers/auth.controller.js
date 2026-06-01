@@ -1,4 +1,9 @@
-import { authenticateUser, getCurrentUser, registerMahasiswa } from "../services/auth.service.js";
+import {
+  authenticateUser,
+  getCurrentUser,
+  processForgotPassword,
+  registerMahasiswa,
+} from "../services/auth.service.js";
 
 export const login = async (req, res) => {
   try {
@@ -88,6 +93,32 @@ export const signup = async (req, res) => {
       success: false,
       message: isConflict ? "Email atau NIM sudah digunakan" : "Gagal sign up",
       data: error.message,
+    });
+  }
+};
+
+// Step 1: request token  |  Step 2: reset with token
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email, token, new_password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email wajib diisi", data: null });
+    }
+
+    const result = await processForgotPassword({ email, token, new_password });
+
+    return res.json({
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  } catch (error) {
+    const status = error.code === "INVALID_TOKEN" ? 400 : error.code === "NOT_FOUND" ? 404 : 500;
+    return res.status(status).json({
+      success: false,
+      message: error.message,
+      data: null,
     });
   }
 };

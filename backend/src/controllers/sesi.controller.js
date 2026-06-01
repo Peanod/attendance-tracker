@@ -267,15 +267,18 @@ export const markHadir = async (req, res) => {
     }
 
     // Upsert: insert jika belum ada, skip jika sudah ada
+    const { status = "hadir" } = req.body;
+    const validStatus = ["hadir", "terlambat"].includes(status) ? status : "hadir";
+
     const result = await query(
       `
         INSERT INTO kehadiran (id_sesi, id_mahasiswa, waktu_presensi, status_kehadiran)
-        VALUES ($1, $2, NOW(), 'hadir')
+        VALUES ($1, $2, NOW(), $3)
         ON CONFLICT (id_sesi, id_mahasiswa)
-        DO UPDATE SET status_kehadiran = 'hadir', waktu_presensi = NOW()
+        DO UPDATE SET status_kehadiran = $3, waktu_presensi = NOW()
         RETURNING *
       `,
-      [id, idMahasiswa],
+      [id, idMahasiswa, validStatus],
     );
 
     return res.status(201).json({

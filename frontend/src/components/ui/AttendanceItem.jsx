@@ -2,16 +2,31 @@ import { CalendarDays, Clock3 } from "lucide-react";
 import Badge from "./Badge";
 import Card from "./Card";
 
-const badgeMap = {
+// Label tampilan yang bersih
+const labelMap = {
+  hadir: "Hadir",
+  terlambat: "Terlambat",
+  absen: "Tidak Hadir",
+  // legacy aliases
+  present: "Hadir",
+  late: "Terlambat",
+  absent: "Tidak Hadir",
+};
+
+// Badge tone mapping ke style yang ada di Badge.jsx
+const toneMap = {
   hadir: "hadir",
-  present: "present",
   terlambat: "terlambat",
-  late: "late",
   absen: "absen",
-  absent: "absent",
+  present: "hadir",
+  late: "terlambat",
+  absent: "absen",
 };
 
 export default function AttendanceItem({ title, date, time, status, compact = false, subtitle }) {
+  const tone = toneMap[status] ?? "absen";
+  const label = labelMap[status] ?? status;
+
   return (
     <Card className={compact ? "rounded-xl p-3 sm:rounded-2xl sm:p-4" : "p-3 sm:p-4"}>
       <div className="flex items-start justify-between gap-3">
@@ -29,7 +44,7 @@ export default function AttendanceItem({ title, date, time, status, compact = fa
             </span>
           </div>
         </div>
-        <Badge tone={badgeMap[status] || "present"}>{status}</Badge>
+        <Badge tone={tone}>{label}</Badge>
       </div>
     </Card>
   );

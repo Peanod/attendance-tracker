@@ -16,12 +16,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   if (isAuthenticated) {
-    if (role === "admin") {
-      return <Navigate to="/admin" replace />;
-    }
-    if (role === "dosen") {
-      return <Navigate to="/dosen" replace />;
-    }
+    if (role === "admin") return <Navigate to="/admin" replace />;
+    if (role === "dosen") return <Navigate to="/dosen" replace />;
     return <Navigate to="/mahasiswa" replace />;
   }
 
@@ -29,20 +25,13 @@ export default function LoginPage() {
     event.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       const result = await login(form);
       const from = location.state?.from?.pathname;
-
-      if (from) {
-        navigate(from, { replace: true });
-      } else if (result.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else if (result.role === "dosen") {
-        navigate("/dosen", { replace: true });
-      } else {
-        navigate("/mahasiswa", { replace: true });
-      }
+      if (from) navigate(from, { replace: true });
+      else if (result.role === "admin") navigate("/admin", { replace: true });
+      else if (result.role === "dosen") navigate("/dosen", { replace: true });
+      else navigate("/mahasiswa", { replace: true });
     } catch (submitError) {
       setError(submitError.message);
     } finally {
@@ -57,7 +46,9 @@ export default function LoginPage() {
           <img src={logoMark} alt="Attendance logo" className="h-12 w-12 rounded-2xl sm:h-16 sm:w-16 sm:rounded-3xl" />
           <div className="mt-5 text-left sm:mt-7 md:text-left">
             <h1 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">Welcome Back</h1>
-            <p className="mt-2 text-sm text-zinc-500 sm:mt-3 sm:text-base">Sign in to continue to Student Attendance Tracker.</p>
+            <p className="mt-2 text-sm text-zinc-500 sm:mt-3 sm:text-base">
+              Sign in to continue to Student Attendance Tracker.
+            </p>
           </div>
 
           <form className="mt-6 space-y-4 sm:mt-8 sm:space-y-5" onSubmit={handleSubmit}>
@@ -70,15 +61,22 @@ export default function LoginPage() {
               placeholder="Enter your email"
               required
             />
-            <Input
-              label="Password"
-              type="password"
-              icon={KeyRound}
-              value={form.password}
-              onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-              placeholder="Enter your password"
-              required
-            />
+            <div className="space-y-1">
+              <Input
+                label="Password"
+                type="password"
+                icon={KeyRound}
+                value={form.password}
+                onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                placeholder="Enter your password"
+                required
+              />
+              <div className="text-right">
+                <Link to="/forgot-password" className="text-xs text-zinc-500 hover:text-black">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
 
             <Alert tone="error" message={error} />
 

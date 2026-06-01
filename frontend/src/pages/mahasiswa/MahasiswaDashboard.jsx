@@ -1,19 +1,26 @@
-import { ArrowRight, Camera, ChevronRight } from "lucide-react";
+import { ArrowRight, Camera, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import PageContainer from "../../components/layout/PageContainer";
 import Alert from "../../components/ui/Alert";
 import AttendanceItem from "../../components/ui/AttendanceItem";
 import Button from "../../components/ui/Button";
-import Card from "../../components/ui/Card";
 import Loading from "../../components/ui/Loading";
 import StatCard from "../../components/ui/StatCard";
 import { useFetch } from "../../hooks/useFetch";
 import { getMahasiswaDashboard } from "../../services/mahasiswa.service";
 
+const PAGE_SIZE = 10;
+
 export default function MahasiswaDashboard() {
-  const { data, loading, error } = useFetch(getMahasiswaDashboard, [], {
+  const { data, loading } = useFetch(getMahasiswaDashboard, [], {
     fallback: { profile: null, stats: { mingguIni: "0/5", attendanceRate: 0 }, riwayatTerbaru: [] },
   });
+  const [page, setPage] = useState(1);
+
+  const items = data?.riwayatTerbaru ?? [];
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const paged = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <PageContainer
@@ -33,7 +40,7 @@ export default function MahasiswaDashboard() {
       {!loading && (
         <section className="mt-5 sm:mt-6">
           <Link to="/mahasiswa/scan" className="block">
-            <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-black text-white p-4 shadow-sm transition hover:bg-zinc-900 sm:rounded-2xl sm:p-5">
+            <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-black p-4 text-white shadow-sm transition hover:bg-zinc-900 sm:rounded-2xl sm:p-5">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:h-14 sm:w-14 sm:rounded-2xl">
                   <Camera className="h-6 w-6 sm:h-7 sm:w-7" />
@@ -57,8 +64,8 @@ export default function MahasiswaDashboard() {
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        {data?.riwayatTerbaru?.length ? (
-          data.riwayatTerbaru.map((item) => (
+        {paged.length ? (
+          paged.map((item) => (
             <AttendanceItem
               key={item.id_kehadiran}
               title={item.nama_matkul}
@@ -68,7 +75,27 @@ export default function MahasiswaDashboard() {
             />
           ))
         ) : (
-          <Alert tone="info" message="Belum ada riwayat kehadiran." />
+          !loading && <Alert tone="info" message="Belum ada riwayat kehadiran." />
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-600 disabled:opacity-30"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="text-sm text-zinc-600">{page} / {totalPages}</span>
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-600 disabled:opacity-30"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         )}
       </section>
     </PageContainer>

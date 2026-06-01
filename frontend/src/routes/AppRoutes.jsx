@@ -6,6 +6,7 @@ import DataMahasiswaPage from "../pages/admin/DataMahasiswaPage";
 import DataMatkulPage from "../pages/admin/DataMatkulPage";
 import LaporanPage from "../pages/admin/LaporanPage";
 import ProfilAdmin from "../pages/admin/ProfilAdmin";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import LoginPage from "../pages/auth/LoginPage";
 import SignupPage from "../pages/auth/SignupPage";
 import BuatSesiPage from "../pages/dosen/BuatSesiPage";
@@ -44,6 +45,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/" element={<HomeRedirect />} />
 
       <Route element={<ProtectedRoute />}>
