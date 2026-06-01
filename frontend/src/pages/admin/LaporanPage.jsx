@@ -1,4 +1,4 @@
-import { ArrowLeft, BarChart3, BookOpen, ChevronRight, Users } from "lucide-react";
+import { ArrowLeft, BarChart3, BookOpen, ChevronRight, Search, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import PageContainer from "../../components/layout/PageContainer";
 import Alert from "../../components/ui/Alert";
@@ -16,6 +16,7 @@ export default function LaporanPage() {
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadLaporan();
@@ -63,6 +64,15 @@ export default function LaporanPage() {
     if (persen >= 50) return "warning";
     return "error";
   };
+
+  const filteredLaporan = laporan.filter((item) => {
+    const q = search.toLowerCase();
+    return (
+      item.nama_matkul?.toLowerCase().includes(q) ||
+      item.kode_matkul?.toLowerCase().includes(q) ||
+      item.nama_dosen?.toLowerCase().includes(q)
+    );
+  });
 
   // Tampilan detail per matkul
   if (selectedMatkul) {
@@ -194,11 +204,23 @@ export default function LaporanPage() {
     >
       {error ? <Alert tone="warning" message={error} /> : null}
 
+      {/* Search bar */}
+      <div className="relative mb-5">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari mata kuliah atau dosen..."
+          className="w-full rounded-2xl border border-zinc-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-zinc-400 focus:ring-0"
+        />
+      </div>
+
       {loading ? (
         <Loading />
-      ) : laporan.length ? (
+      ) : filteredLaporan.length ? (
         <div className="space-y-4">
-          {laporan.map((item) => (
+          {filteredLaporan.map((item) => (
             <Card
               key={item.id_matkul}
               className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
@@ -231,7 +253,14 @@ export default function LaporanPage() {
           ))}
         </div>
       ) : (
-        <Alert tone="info" message="Belum ada data laporan. Tambah mata kuliah dan mulai sesi absensi terlebih dahulu." />
+        <Alert
+          tone="info"
+          message={
+            search
+              ? `Tidak ada hasil untuk "${search}".`
+              : "Belum ada data laporan. Tambah mata kuliah dan mulai sesi absensi terlebih dahulu."
+          }
+        />
       )}
     </PageContainer>
   );

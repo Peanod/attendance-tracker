@@ -248,3 +248,37 @@ export const getDosenDashboard = async (req, res) => {
     });
   }
 };
+export const updateDosenProfile = async (req, res) => {
+  try {
+    const { nama_dosen, nip, email, password } = req.body;
+    const current = await query("SELECT * FROM dosen WHERE id_dosen = $1", [req.user.id]);
+
+    if (!current.rows[0]) {
+      return res.status(404).json({ success: false, message: "Dosen tidak ditemukan", data: null });
+    }
+
+    const nextPassword = password ? await hashPassword(password) : current.rows[0].password;
+    const result = await query(
+      `UPDATE dosen
+       SET nama_dosen = $1, nip = $2, email = $3, password = $4, updated_at = NOW()
+       WHERE id_dosen = $5
+       RETURNING id_dosen, nip, nama_dosen, email`,
+      [
+        nama_dosen ?? current.rows[0].nama_dosen,
+        nip ?? current.rows[0].nip,
+        email ?? current.rows[0].email,
+        nextPassword,
+        req.user.id,
+      ],
+    );
+
+    return res.json({ success: true, message: "Profil berhasil diperbarui", data: result.rows[0] });
+  } catch (error) {
+    const status = error.code === "23505" ? 409 : 500;
+    return res.status(status).json({
+      success: false,
+      message: status === 409 ? "Email atau NIP sudah digunakan" : "Gagal memperbarui profil",
+      data: error.message,
+    });
+  }
+};
