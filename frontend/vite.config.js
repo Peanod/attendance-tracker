@@ -31,13 +31,15 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: "/offline.html",
+        navigateFallback: null,
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
             handler: "NetworkOnly",
           },
         ],
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],
