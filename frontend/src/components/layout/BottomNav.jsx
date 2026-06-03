@@ -1,23 +1,25 @@
-import { BarChart3, BookOpen, Home, QrCode, UserRound } from "lucide-react";
+import { BarChart3, BookOpen, GraduationCap, Home, QrCode, UserSquare2, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navByRole = {
   admin: [
-    { to: "/admin", label: "Home", icon: Home, end: true },
-    { to: "/admin/mahasiswa", label: "Student", icon: UserRound },
-    { to: "/admin/dosen", label: "Lecturer", icon: BookOpen },
+    { to: "/admin", label: "Dashboard", icon: Home, end: true },
+    { to: "/admin/mahasiswa", label: "Mahasiswa", icon: Users },
+    { to: "/admin/dosen", label: "Dosen", icon: GraduationCap },
+    { to: "/admin/matkul", label: "Mata Kuliah", icon: BookOpen },
     { to: "/admin/laporan", label: "Laporan", icon: BarChart3 },
+    { to: "/admin/profil", label: "Profil", icon: UserSquare2 },
   ],
   dosen: [
-    { to: "/dosen", label: "Home", icon: Home, end: true },
+    { to: "/dosen", label: "Dashboard", icon: Home, end: true },
     { to: "/dosen/sesi/buat", label: "Buat Sesi", icon: QrCode },
-    { to: "/dosen/profil", label: "Profil", icon: UserRound },
+    { to: "/dosen/profil", label: "Profil", icon: UserSquare2 },
   ],
   mahasiswa: [
-    { to: "/mahasiswa", label: "Home", icon: Home, end: true },
-    { to: "/mahasiswa/scan", label: "Scan", icon: QrCode },
-    { to: "/mahasiswa/riwayat", label: "History", icon: BarChart3 },
-    { to: "/mahasiswa/profil", label: "Profile", icon: UserRound },
+    { to: "/mahasiswa", label: "Dashboard", icon: Home, end: true },
+    { to: "/mahasiswa/scan", label: "Scan QR", icon: QrCode },
+    { to: "/mahasiswa/riwayat", label: "Riwayat", icon: BarChart3 },
+    { to: "/mahasiswa/profil", label: "Profil", icon: UserSquare2 },
   ],
 };
 
@@ -25,6 +27,8 @@ const gridClass = {
   2: "grid-cols-2",
   3: "grid-cols-3",
   4: "grid-cols-4",
+  5: "grid-cols-5",
+  6: "grid-cols-6",
 };
 
 export default function BottomNav({ role }) {

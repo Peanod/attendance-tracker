@@ -1,4 +1,4 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Menu } from "lucide-react";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -57,10 +57,10 @@ export default function AppHeader({ title, subtitle, actions, compact = false })
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((prev) => !prev)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black font-bold text-base hover:ring-2 hover:ring-white/60 transition sm:h-11 sm:w-11 sm:text-lg"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black hover:ring-2 hover:ring-white/60 transition sm:h-11 sm:w-11"
               aria-label="Menu profil"
             >
-              {initials}
+              <Menu className="h-5 w-5" />
             </button>
 
             {dropdownOpen && (
