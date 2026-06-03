@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, GraduationCap, Home, QrCode, UserSquare2, Users } from "lucide-react";
+import { BarChart3, BookOpen, GraduationCap, Home, QrCode, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navByRole = {
@@ -8,18 +8,15 @@ const navByRole = {
     { to: "/admin/dosen", label: "Dosen", icon: GraduationCap },
     { to: "/admin/matkul", label: "Mata Kuliah", icon: BookOpen },
     { to: "/admin/laporan", label: "Laporan", icon: BarChart3 },
-    { to: "/admin/profil", label: "Profil", icon: UserSquare2 },
   ],
   dosen: [
     { to: "/dosen", label: "Dashboard", icon: Home, end: true },
     { to: "/dosen/sesi/buat", label: "Buat Sesi", icon: QrCode },
-    { to: "/dosen/profil", label: "Profil", icon: UserSquare2 },
   ],
   mahasiswa: [
     { to: "/mahasiswa", label: "Dashboard", icon: Home, end: true },
     { to: "/mahasiswa/scan", label: "Scan QR", icon: QrCode },
     { to: "/mahasiswa/riwayat", label: "Riwayat", icon: BarChart3 },
-    { to: "/mahasiswa/profil", label: "Profil", icon: UserSquare2 },
   ],
 };
 
