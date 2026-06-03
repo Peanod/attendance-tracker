@@ -54,7 +54,7 @@ export default function AppHeader({ title, subtitle, actions, compact = false })
             </div>
           </div>
 
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative md:hidden" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((prev) => !prev)}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black hover:ring-2 hover:ring-white/60 transition sm:h-11 sm:w-11"
